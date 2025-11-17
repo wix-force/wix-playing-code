@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Facility Booking</title>
+    <style>
+        :root {
+            --primary: #2c5aa0;
+            --secondary: #f0a500;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --danger: #dc3545;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .booking-type-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .booking-type {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .booking-type.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .booking-type:first-child {
+            border-right: none;
+        }
+        
+        .booking-type:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        
+        .booking-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        .date-display {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .calendar-icon {
+            cursor: pointer;
+            color: var(--primary);
+        }
+        
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-option input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .time-slot {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .time-slot:hover {
+            border-color: var(--primary);
+        }
+        
+        .time-slot.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .time-slot.unavailable {
+            background-color: #f8f9fa;
+            color: var(--gray);
+            cursor: not-allowed;
+            border-color: #e9ecef;
+        }
+        
+        .availability-info {
+            background-color: #e9f7fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .availability-details {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .availability-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .availability-item i {
+            margin-right: 8px;
+            color: var(--primary);
+        }
+        
+        .price-display {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .book-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .book-button:hover {
+            background-color: #e09500;
+        }
+        
+        .book-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .coach-selection {
+            margin-top: 15px;
+        }
+        
+        .coach-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .coach-option {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .coach-option:hover {
+            border-color: var(--primary);
+        }
+        
+        .coach-option.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .coach-option.unavailable {
+            background-color: #f8f9fa;
+            color: var(--gray);
+            cursor: not-allowed;
+            border-color: #e9ecef;
+        }
+        
+        .coach-name {
+            font-weight: 600;
+        }
+        
+        .coach-specialty {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .time-slots {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .availability-details {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .coach-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>BOOK A SESSION</h1>
+            <div class="subtitle">Cricket Training & Coaching</div>
+        </header>
+        
+        <div class="booking-type-selector">
+            <div class="booking-type active" data-type="net-hire">Net Hire</div>
+            <div class="booking-type" data-type="coaching">1-to-1 Coaching</div>
+        </div>
+        
+        <div class="booking-form">
+            <div class="form-section">
+                <div class="section-title">
+                    <i>📅</i> Select Date
+                </div>
+                <div class="date-display">
+                    <span id="selected-date">18 Oct, 2025</span>
+                    <span class="calendar-icon">📅</span>
+                </div>
+            </div>
+            
+            <div class="form-section" id="net-hire-section">
+                <div class="section-title">
+                    <i>🏏</i> Net Hire Options
+                </div>
+                <div class="checkbox-option">
+                    <input type="checkbox" id="bowling-machine">
+                    <label for="bowling-machine">Add bowling machine (+£5)</label>
+                </div>
+            </div>
+            
+            <div class="form-section hidden" id="coaching-section">
+                <div class="section-title">
+                    <i>👨‍🏫</i> Select Coach
+                </div>
+                <div class="coach-selection">
+                    <div class="coach-options">
+                        <div class="coach-option selected" data-coach="1">
+                            <div class="coach-name">Coach Smith</div>
+                            <div class="coach-specialty">Batting Specialist</div>
+                        </div>
+                        <div class="coach-option" data-coach="2">
+                            <div class="coach-name">Coach Johnson</div>
+                            <div class="coach-specialty">Bowling Specialist</div>
+                        </div>
+                        <div class="coach-option" data-coach="3">
+                            <div class="coach-name">Coach Williams</div>
+                            <div class="coach-specialty">All-rounder</div>
+                        </div>
+                        <div class="coach-option unavailable" data-coach="4">
+                            <div class="coach-name">Coach Brown</div>
+                            <div class="coach-specialty">Wicket Keeping</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="section-title">
+                    <i>⏰</i> Select Time
+                </div>
+                <div class="time-slots">
+                    <div class="time-slot selected" data-time="09:30">09:30</div>
+                    <div class="time-slot" data-time="10:30">10:30</div>
+                    <div class="time-slot unavailable" data-time="11:30">11:30</div>
+                    <div class="time-slot" data-time="12:30">12:30</div>
+                    <div class="time-slot" data-time="13:30">13:30</div>
+                    <div class="time-slot" data-time="14:30">14:30</div>
+                    <div class="time-slot" data-time="15:30">15:30</div>
+                    <div class="time-slot" data-time="16:30">16:30</div>
+                    <div class="time-slot" data-time="17:30">17:30</div>
+                    <div class="time-slot" data-time="18:30">18:30</div>
+                    <div class="time-slot" data-time="19:30">19:30</div>
+                    <div class="time-slot" data-time="20:30">20:30</div>
+                </div>
+            </div>
+            
+            <div class="availability-info">
+                <div class="availability-details">
+                    <div class="availability-item">
+                        <i>🏏</i> Nets available: <span id="nets-available">3</span>
+                    </div>
+                    <div class="availability-item">
+                        <i>🤖</i> Machines available: <span id="machines-available">2</span>
+                    </div>
+                    <div class="availability-item" id="coaches-available-item">
+                        <i>👨‍🏫</i> Coaches available: <span id="coaches-available">2</span>
+                    </div>
+                </div>
+                <div class="price-display">
+                    Price: <span id="price">£25</span>
+                </div>
+            </div>
+            
+            <button class="book-button" id="book-now-button">BOOK NOW</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const bookingTypeElements = document.querySelectorAll('.booking-type');
+        const netHireSection = document.getElementById('net-hire-section');
+        const coachingSection = document.getElementById('coaching-section');
+        const coachesAvailableItem = document.getElementById('coaches-available-item');
+        const bowlingMachineCheckbox = document.getElementById('bowling-machine');
+        const timeSlotElements = document.querySelectorAll('.time-slot');
+        const coachOptionElements = document.querySelectorAll('.coach-option');
+        const bookNowButton = document.getElementById('book-now-button');
+        const priceDisplay = document.getElementById('price');
+        const netsAvailableDisplay = document.getElementById('nets-available');
+        const machinesAvailableDisplay = document.getElementById('machines-available');
+        const coachesAvailableDisplay = document.getElementById('coaches-available');
+
+        // Booking State
+        let bookingState = {
+            type: 'net-hire', // 'net-hire' or 'coaching'
+            date: '18 Oct, 2025',
+            time: '09:30',
+            bowlingMachine: false,
+            coach: '1',
+            price: 25
+        };
+
+        // Pricing Configuration
+        const pricing = {
+            netHire: {
+                dayRate: 20, // 9:30 - 16:30
+                eveningRate: 30, // 16:30 - 21:30
+                bowlingMachine: 5
+            },
+            coaching: {
+                baseRate: 40,
+                bowlingMachine: 5
+            }
+        };
+
+        // Initialize the booking interface
+        function initializeBooking() {
+            // Set up booking type selection
+            bookingTypeElements.forEach(element => {
+                element.addEventListener('click', () => {
+                    const type = element.getAttribute('data-type');
+                    setBookingType(type);
+                });
+            });
+
+            // Set up time slot selection
+            timeSlotElements.forEach(element => {
+                if (!element.classList.contains('unavailable')) {
+                    element.addEventListener('click', () => {
+                        const time = element.getAttribute('data-time');
+                        setSelectedTime(time);
+                    });
+                }
+            });
+
+            // Set up coach selection
+            coachOptionElements.forEach(element => {
+                if (!element.classList.contains('unavailable')) {
+                    element.addEventListener('click', () => {
+                        const coach = element.getAttribute('data-coach');
+                        setSelectedCoach(coach);
+                    });
+                }
+            });
+
+            // Set up bowling machine toggle
+            bowlingMachineCheckbox.addEventListener('change', () => {
+                bookingState.bowlingMachine = bowlingMachineCheckbox.checked;
+                updatePrice();
+            });
+
+            // Set up book now button
+            bookNowButton.addEventListener('click', handleBooking);
+            
+            // Initialize with default values
+            updatePrice();
+        }
+
+        // Set the booking type (Net Hire or Coaching)
+        function setBookingType(type) {
+            bookingState.type = type;
+            
+            // Update UI for booking type selection
+            bookingTypeElements.forEach(element => {
+                if (element.getAttribute('data-type') === type) {
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
+            });
+            
+            // Show/hide relevant sections
+            if (type === 'net-hire') {
+                netHireSection.classList.remove('hidden');
+                coachingSection.classList.add('hidden');
+                coachesAvailableItem.classList.add('hidden');
+            } else {
+                netHireSection.classList.add('hidden');
+                coachingSection.classList.remove('hidden');
+                coachesAvailableItem.classList.remove('hidden');
+            }
+            
+            updatePrice();
+        }
+
+        // Set the selected time slot
+        function setSelectedTime(time) {
+            bookingState.time = time;
+            
+            // Update UI for time selection
+            timeSlotElements.forEach(element => {
+                if (element.getAttribute('data-time') === time) {
+                    element.classList.add('selected');
+                } else {
+                    element.classList.remove('selected');
+                }
+            });
+            
+            updatePrice();
+        }
+
+        // Set the selected coach (for coaching sessions)
+        function setSelectedCoach(coach) {
+            bookingState.coach = coach;
+            
+            // Update UI for coach selection
+            coachOptionElements.forEach(element => {
+                if (element.getAttribute('data-coach') === coach) {
+                    element.classList.add('selected');
+                } else {
+                    element.classList.remove('selected');
+                }
+            });
+        }
+
+        // Calculate and update the price based on current selections
+        function updatePrice() {
+            let basePrice = 0;
+            
+            if (bookingState.type === 'net-hire') {
+                // Determine if it's day rate or evening rate
+                const hour = parseInt(bookingState.time.split(':')[0]);
+                const isEvening = hour >= 16;
+                
+                basePrice = isEvening ? pricing.netHire.eveningRate : pricing.netHire.dayRate;
+                
+                // Add bowling machine cost if selected
+                if (bookingState.bowlingMachine) {
+                    basePrice += pricing.netHire.bowlingMachine;
+                }
+            } else {
+                // Coaching session
+                basePrice = pricing.coaching.baseRate;
+                
+                // Add bowling machine cost if selected
+                if (bookingState.bowlingMachine) {
+                    basePrice += pricing.coaching.bowlingMachine;
+                }
+            }
+            
+            bookingState.price = basePrice;
+            priceDisplay.textContent = `£${basePrice}`;
+        }
+
+        // Handle the booking process
+        function handleBooking() {
+            // Validate selection
+            if (!bookingState.time) {
+                alert('Please select a time slot');
+                return;
+            }
+            
+            if (bookingState.type === 'coaching' && !bookingState.coach) {
+                alert('Please select a coach');
+                return;
+            }
+            
+            // In a real implementation, this would integrate with Wix Bookings and Payments
+            // For now, we'll just show a confirmation message
+            const bookingType = bookingState.type === 'net-hire' ? 'Net Hire' : '1-to-1 Coaching';
+            const bowlingMachineText = bookingState.bowlingMachine ? ' with Bowling Machine' : '';
+            const coachText = bookingState.type === 'coaching' ? ` with Coach ${bookingState.coach}` : '';
+            
+            alert(`Booking Confirmed!\n\nType: ${bookingType}${coachText}\nDate: ${bookingState.date}\nTime: ${bookingState.time}\nBowling Machine: ${bookingState.bowlingMachine ? 'Yes' : 'No'}\nTotal: £${bookingState.price}`);
+            
+            // Reset form for next booking
+            resetBookingForm();
+        }
+
+        // Reset the booking form to default state
+        function resetBookingForm() {
+            bookingState = {
+                type: 'net-hire',
+                date: '18 Oct, 2025',
+                time: '09:30',
+                bowlingMachine: false,
+                coach: '1',
+                price: 25
+            };
+            
+            setBookingType('net-hire');
+            setSelectedTime('09:30');
+            setSelectedCoach('1');
+            bowlingMachineCheckbox.checked = false;
+            updatePrice();
+        }
+
+        // Initialize the booking system when the page loads
+        document.addEventListener('DOMContentLoaded', initializeBooking);
+    </script>
+</body>
+</html>

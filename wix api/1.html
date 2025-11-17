@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wix Submissions Frontend</title>
+<style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    input, button { margin: 5px 0; padding: 5px; }
+    .submission { border: 1px solid #ccc; padding: 10px; margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<h1>Submissions Manager</h1>
+
+<h2>Create / Update Submission</h2>
+<input type="text" id="submissionId" placeholder="Leave empty for new item">
+<input type="text" id="name" placeholder="Name">
+<input type="text" id="companyName" placeholder="Company Name">
+<button onclick="saveSubmission()">Save</button>
+
+<h2>Search Submissions</h2>
+<input type="text" id="searchQuery" placeholder="Search by name or company">
+<button onclick="search()">Search</button>
+
+<h2>All Submissions</h2>
+<div id="submissionsList"></div>
+
+<script>
+const WIX_API_BASE = "https://khairuloffice259.wixsite.com/wix-stores-external/_functions/submissions"; // Replace with your Wix endpoint
+
+// Helper fetch function
+async function wixFetch(url, options = {}) {
+    options.headers = { "Content-Type": "application/json", ...options.headers };
+    const res = await fetch(url, options);
+    return res.json();
+}
+
+// Load all submissions
+async function loadAllSubmissions() {
+    const data = await wixFetch(WIX_API_BASE, { method: "GET" });
+    const list = document.getElementById("submissionsList");
+    list.innerHTML = "";
+    if (data.items && data.items.length) {
+        data.items.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "submission";
+            div.innerHTML = `
+                <strong>${item.name}</strong> (${item.companyName})<br>
+                <button onclick="editSubmission('${item._id}', '${item.name}', '${item.companyName}')">Edit</button>
+                <button onclick="deleteSubmission('${item._id}')">Delete</button>
+            `;
+            list.appendChild(div);
+        });
+    } else {
+        list.innerHTML = "<em>No submissions found.</em>";
+    }
+}
+
+// Save (create or update) submission
+async function saveSubmission() {
+    const id = document.getElementById("submissionId").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const companyName = document.getElementById("companyName").value.trim();
+
+    if (!name || !companyName) {
+        alert("Name and Company Name are required!");
+        return;
+    }
+
+    const payload = { name, companyName };
+    let response;
+
+    if (id) {
+        response = await wixFetch(`${WIX_API_BASE}/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+    } else {
+        response = await wixFetch(WIX_API_BASE, { method: "POST", body: JSON.stringify(payload) });
+    }
+
+    alert(response.success ? "Saved successfully!" : response.error);
+    clearForm();
+    loadAllSubmissions();
+}
+
+// Fill form for editing
+function editSubmission(id, name, companyName) {
+    document.getElementById("submissionId").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("companyName").value = companyName;
+}
+
+// Delete submission
+async function deleteSubmission(id) {
+    if (!confirm("Are you sure you want to delete this submission?")) return;
+    const response = await wixFetch(`${WIX_API_BASE}/${id}`, { method: "DELETE" });
+    alert(response.success ? "Deleted successfully!" : response.error);
+    loadAllSubmissions();
+}
+
+// Search submissions
+async function search() {
+    const query = document.getElementById("searchQuery").value.trim();
+    if (!query) {
+        loadAllSubmissions();
+        return;
+    }
+    const response = await wixFetch(`${WIX_API_BASE}/search?query=${encodeURIComponent(query)}`, { method: "GET" });
+    const list = document.getElementById("submissionsList");
+    list.innerHTML = "";
+    if (response.items && response.items.length) {
+        response.items.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "submission";
+            div.innerHTML = `
+                <strong>${item.name}</strong> (${item.companyName})<br>
+                <button onclick="editSubmission('${item._id}', '${item.name}', '${item.companyName}')">Edit</button>
+                <button onclick="deleteSubmission('${item._id}')">Delete</button>
+            `;
+            list.appendChild(div);
+        });
+    } else {
+        list.innerHTML = "<em>No results found.</em>";
+    }
+}
+
+// Clear form
+function clearForm() {
+    document.getElementById("submissionId").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("companyName").value = "";
+}
+
+// Initial load
+loadAllSubmissions();
+</script>
+
+</body>
+</html>
