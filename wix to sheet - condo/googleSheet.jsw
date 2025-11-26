@@ -1,0 +1,18 @@
+// backend/googleSheet.jsw
+import { fetch } from 'wix-fetch';
+
+/**
+ * Send form data to Google Sheet
+ * @param {Object} formData 
+ * @returns {Promise<Object>}
+ */
+export function sendToGoogleSheet(formData) {
+    return fetch("https://script.google.com/macros/s/AKfycbxcNv4gxIDi1R6yL8STSgyd5Ml1VvZXZf9SBK73fxwKYXMgFejMPakT7EXxeBulpuIHEA/exec", { // replace with your deployed Web App URL
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json());
+}

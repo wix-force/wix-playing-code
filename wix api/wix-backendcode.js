@@ -270,7 +270,7 @@ export function get_submissions_search(request) {
 // // }
 
 // // -----------------
-// // curd 
+// // curd
 
 // import { ok, notFound, serverError, badRequest } from 'wix-http-functions';
 // import wixData from 'wix-data';

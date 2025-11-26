@@ -1,0 +1,46 @@
+// backend/flow.jsw
+
+import * as gtf from 'backend/getFlow.js';
+
+/* ==========================
+   Generic single email
+========================== */
+export async function triggerEmail(email = "", vars = {}) {
+    return await gtf.default.sendEmail(email, vars);
+}
+
+/* ==========================
+   Order emails
+========================== */
+export async function triggerOrderEmails(formData) {
+    try {
+        const userEmail = formData.email;
+        const adminEmail = "booking@monteur-base.de"; // Admin email if needed
+
+        console.log("flow formData: ", formData);
+
+        // Prepare template variables matching Wix template placeholders
+        const vars = {
+            name1: formData.companyName || "",
+            email1: formData.email || "",
+            phone1: formData.telephone || "",
+            contactPerson1: formData.contactPerson || "",
+            startDate1: formData.startDate ? new Date(formData.startDate).toLocaleDateString("en-GB") : "",
+            endDate1: formData.endDate ? new Date(formData.endDate).toLocaleDateString("en-GB") : "",
+            membersOption1: formData.membersOption || "",
+            postalOrCity1: formData.postalOrCity || "",
+        };
+
+        // Send email to user
+        const userResult = await gtf.default.sendEmail(userEmail, vars);
+
+        // Optional: Send email to admin
+        const adminResult = await gtf.default.sendEmail(adminEmail, vars);
+
+        // return userResult;
+        return { userResult, adminResult }; // if you want both
+    } catch (error) {
+        console.error("Error in triggerOrderEmails:", error);
+        throw error;
+    }
+}
